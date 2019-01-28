@@ -46,6 +46,7 @@ def bfs(maze):
 
     while not reachedTarget:
         # next nodes to visit with one step further
+        # implement queue by list to maintain FIFO ordering
         nextFrontier = []
         pathLength += 1
 
@@ -87,7 +88,46 @@ def bfs(maze):
 def dfs(maze):
     # TODO: Write your code here
     # return path, num_states_explored
-    return [], 0
+    start = maze.getStart()
+    end = maze.getObjectives()[0]
+
+    # the difference between BFS is the list here is used as stack to maintain LIFO ordering
+    frontier = [start]
+    # store the explored state with its parent state, to save space
+    # state: the coordinates, node: the coordinates and their parents
+    explored = {start: None}
+    numExploredStates = 1
+    reachedTarget = False
+
+    while not reachedTarget:
+        # use the top of the stack to explore and pop it
+        curt = frontier.pop()
+        neighbors = maze.getNeighbors(curt[0], curt[1])
+
+        for neighbor in neighbors:
+            if neighbor in explored:
+                continue
+
+            numExploredStates += 1
+            explored[neighbor] = curt
+
+            if neighbor == end:
+                reachedTarget = True
+                break
+
+            frontier.append(neighbor)
+
+    print(explored)
+
+    # trace back to find the path by the special explored set
+    reversedPath = []
+    curt = end
+
+    while curt:
+        reversedPath.append(curt)
+        curt = explored[curt]
+
+    return list(reversed(reversedPath)), numExploredStates
 
 
 def greedy(maze):
