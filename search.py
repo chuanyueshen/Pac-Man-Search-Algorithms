@@ -34,7 +34,54 @@ def search(maze, searchMethod):
 def bfs(maze):
     # TODO: Write your code here
     # return path, num_states_explored
-    return [], 0
+    start = maze.getStart()
+    end = maze.getObjectives()[0]
+
+    frontier = [start]
+    # store the explored state with its parent state, to save space
+    explored = {start: None}
+    pathLength = 1
+    numExploredStates = 1
+    reachedTarget = False
+
+    while not reachedTarget:
+        # next nodes to visit with one step further
+        nextFrontier = []
+        pathLength += 1
+
+        for col, row in frontier:
+            if reachedTarget:
+                break
+
+            numExploredStates += 1
+            neighbors = maze.getNeighbors(col, row)
+
+            for neighbor in neighbors:
+                if neighbor in explored:
+                    continue
+
+                explored[neighbor] = (col, row)
+
+                if neighbor == end:
+                    reachedTarget = True
+                    break
+
+                nextFrontier.append(neighbor)
+
+        frontier = nextFrontier
+
+    print(explored)
+    print('The path length is ' + str(pathLength))
+
+    # trace back to find the path by the special explored set
+    reversedPath = []
+    curt = end
+
+    while curt:
+        reversedPath.append(curt)
+        curt = explored[curt]
+
+    return list(reversed(reversedPath)), numExploredStates
 
 
 def dfs(maze):
