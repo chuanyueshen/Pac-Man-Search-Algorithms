@@ -133,7 +133,46 @@ def dfs(maze):
 def greedy(maze):
     # TODO: Write your code here
     # return path, num_states_explored
-    return [], 0
+    start = maze.getStart()
+    end = maze.getObjectives()[0]
+    frontier = [start]
+    
+    explored = {start:None}
+    pathLength = 1
+    numExploredStates = 1
+    reachedTarget = False
+    
+    while not reachedTarget:
+        curt = frontier.pop()
+        neighbors = maze.getNeighbors(curt[0], curt[1])
+        dist = [(abs(neighbor[0]-end[0])+abs(neighbor[1]-end[1])) for neighbor in neighbors]
+        pair_dist_node =[(dist[i], neighbors[i]) for i in range(len(dist))]
+        pair_dist_node.sort()
+        pair_dist_node.reverse()
+
+        sorted_neighbors = [pair_dist_node[i][1] for i in range(len(pair_dist_node))] 
+        
+    
+        for  neighbor in sorted_neighbors:
+            if neighbor in explored:
+                continue
+            numExploredStates += 1
+            explored[neighbor] = curt 
+            if neighbor == end:
+                reachedTarget = True
+                break
+                nextFrontier.append(neighbor)
+
+            frontier.append(neighbor)
+            
+    print('The path length is ' + str(pathLength))
+    reversedPath = []
+    curt = end
+
+    while curt:
+            reversedPath.append(curt)
+            curt = explored[curt]
+    return list(reversed(reversedPath)), numExploredStates
 
 
 def astar(maze):
