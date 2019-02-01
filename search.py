@@ -178,4 +178,44 @@ def greedy(maze):
 def astar(maze):
     # TODO: Write your code here
     # return path, num_states_explored
-    return [], 0
+    start = maze.getStart()
+    end = maze.getObjectives()[0]
+    h_start = abs(end[0]-start[0]) + abs(end[1] - start[1])
+    frontier = [(start, h_start)]
+
+    explored = {(start,h_start):None}
+    pathLength = 1
+    numExploredStates = 1
+    reachedTarget = False
+
+    while not reachedTarget:
+        nextFrontier = []
+        pathLength += 1
+        for coords, fn in frontier:
+            if reachedTarget:
+                break
+            numExploredStates += 1
+            neighbors = maze.getNeighbors(coords[0], coords[1])
+            dist = [pathLength + abs(neighbor[0] - end[0]) + abs(neighbor[1]-end[1]) for neighbor in neighbors]
+            pair_dist = [(dist[i], neighbors[i]) for i in range(len(dist))]
+            pair_dist.sort()
+            explored_coords_dist = {list(explored.keys())[i][0]:list(explored.keys())[i][1] for i in range(len(explored))}
+            for dist_n, coords_n in pair_dist:
+                if coords_n in list(explored_coords_dist.keys()):
+                    if int(dist_n) > int(explored_coords_dist[coords_n]):
+                        continue
+                explored[(coords_n, dist_n)] = (coords, fn)
+                if coords_n == end:
+                    reachedTarget = True
+                    break
+        
+                nextFrontier.append((coords_n, dist_n))
+        frontier = nextFrontier
+    print('The path length is ' + str(pathLength))
+    reversedPath = []
+    curt = (end, pathLength)
+
+    while curt:
+        reversedPath.append(curt[0])
+        curt = explored[curt]
+    return list(reversed(reversedPath)), numExploredStates
