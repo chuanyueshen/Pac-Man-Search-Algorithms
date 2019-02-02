@@ -72,7 +72,6 @@ def bfs(maze):
         frontier = nextFrontier
 
     print(explored)
-    print('The path length is ' + str(pathLength))
 
     # trace back to find the path by the special explored set
     reversedPath = []
@@ -153,7 +152,7 @@ def greedy(maze):
         sorted_neighbors = [pair_dist_node[i][1] for i in range(len(pair_dist_node))] 
         
     
-        for  neighbor in sorted_neighbors:
+        for neighbor in sorted_neighbors:
             if neighbor in explored:
                 continue
             numExploredStates += 1
@@ -165,7 +164,6 @@ def greedy(maze):
 
             frontier.append(neighbor)
             
-    print('The path length is ' + str(pathLength))
     reversedPath = []
     curt = end
 
@@ -178,44 +176,64 @@ def greedy(maze):
 def astar(maze):
     # TODO: Write your code here
     # return path, num_states_explored
+    # use heapq module for implementing priority queue
+    from heapq import heappush, heappop
+
     start = maze.getStart()
     end = maze.getObjectives()[0]
-    h_start = abs(end[0]-start[0]) + abs(end[1] - start[1])
-    frontier = [(start, h_start)]
 
-    explored = {(start,h_start):None}
+    def cal_h(coord):
+        return abs(coord[0] - start[0]) + abs(coord[1] - start[1])
+
+    # the tuple is as (d(n) + h(n), d(n), coordinates)
+    frontier = [(cal_h(start), 0, start)]
+
+    explored = {start: None}
     pathLength = 1
     numExploredStates = 1
     reachedTarget = False
 
     while not reachedTarget:
-        nextFrontier = []
+        _, curt_d, curt = heappop(frontier)
         pathLength += 1
-        for coords, fn in frontier:
-            if reachedTarget:
-                break
+
+        if curt == end:
+            break
+
+        for neighbor in maze.getNeighbors(curt[0], curt[1]):
+            if neighbor in explored:
+                continue
+
             numExploredStates += 1
-            neighbors = maze.getNeighbors(coords[0], coords[1])
-            dist = [pathLength + abs(neighbor[0] - end[0]) + abs(neighbor[1]-end[1]) for neighbor in neighbors]
-            pair_dist = [(dist[i], neighbors[i]) for i in range(len(dist))]
-            pair_dist.sort()
-            explored_coords_dist = {list(explored.keys())[i][0]:list(explored.keys())[i][1] for i in range(len(explored))}
-            for dist_n, coords_n in pair_dist:
-                if coords_n in list(explored_coords_dist.keys()):
-                    if int(dist_n) > int(explored_coords_dist[coords_n]):
-                        continue
-                explored[(coords_n, dist_n)] = (coords, fn)
-                if coords_n == end:
-                    reachedTarget = True
-                    break
-        
-                nextFrontier.append((coords_n, dist_n))
-        frontier = nextFrontier
-    print('The path length is ' + str(pathLength))
+            heappush(frontier, (curt_d + 1 + cal_h(neighbor), curt_d + 1, neighbor))
+            explored[neighbor] = curt
+
+        # for coords, fn in frontier:
+        #     if reachedTarget:
+        #         break
+        #     numExploredStates += 1
+        #     neighbors = maze.getNeighbors(coords[0], coords[1])
+        #     dist = [pathLength + abs(neighbor[0] - end[0]) + abs(neighbor[1]-end[1]) for neighbor in neighbors]
+        #     pair_dist = [(dist[i], neighbors[i]) for i in range(len(dist))]
+        #     pair_dist.sort()
+        #     explored_coords_dist = {list(explored.keys())[i][0]:list(explored.keys())[i][1] for i in range(len(explored))}
+        #     for dist_n, coords_n in pair_dist:
+        #         if coords_n in list(explored_coords_dist.keys()):
+        #             if int(dist_n) > int(explored_coords_dist[coords_n]):
+        #                 continue
+        #         explored[(coords_n, dist_n)] = (coords, fn)
+        #         if coords_n == end:
+        #             reachedTarget = True
+        #             break
+        #
+        #         nextFrontier.append((coords_n, dist_n))
+        # frontier = nextFrontier
+
     reversedPath = []
-    curt = (end, pathLength)
+    curt = end
 
     while curt:
-        reversedPath.append(curt[0])
+        reversedPath.append(curt)
         curt = explored[curt]
+
     return list(reversed(reversedPath)), numExploredStates
