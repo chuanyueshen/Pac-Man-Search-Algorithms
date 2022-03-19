@@ -1,5 +1,5 @@
-# CS 440 MP1: Search Algorithms
-Spring 2019
+# Pac-Man Search Algorithms
+CS 440 Spring 2019
 
 This MP requirement was described in https://courses.engr.illinois.edu/cs440/sp2019/assignments/MP1/web/assignment1.html
 ## Credit to team members:
